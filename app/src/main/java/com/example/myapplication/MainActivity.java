@@ -1,5 +1,7 @@
 package com.example.myapplication;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -7,25 +9,12 @@ import androidx.lifecycle.Lifecycle;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.content.Context;
-import android.os.Bundle;
-
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-
 public class MainActivity extends AppCompatActivity {
-    public static ArrayList<Integer> data = new ArrayList<>();
-    public static ArrayList<Integer> yearlyIncome = new ArrayList<>();
-    public static ArrayList<Integer> yearlyExpense = new ArrayList<>();
     public class MyPagerAdapter extends FragmentStateAdapter {
-        private static final int NUM_TABS = 4;
+        private static final int NUM_TABS = 5;
         public MyPagerAdapter(FragmentManager fragmentManager, Lifecycle lifecycle) {
             super(fragmentManager, lifecycle);
         }
@@ -33,13 +22,15 @@ public class MainActivity extends AppCompatActivity {
         public Fragment createFragment(int position) {
             switch (position) {
                 case 0:
-                    return new TaskViewFragment();
+                    return new BookViewFragment();
                 case 1:
-                    return new RewardViewFragment();
+                    return new WebViewFragment();
                 case 2:
-                    return new StatisticsViewFragment();
+                    return new MapViewFragment();
                 case 3:
-                    return new MyViewFragment();
+                    return new ClockFragment();
+                case 4:
+                    return new GameViewFragment();
                 default:
                     return null;
             }
@@ -53,31 +44,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        data.add(0);
-        data.add(0);
-
-        for(int i = 0;i < 12;i++) {
-            yearlyIncome.add(0);
-            yearlyExpense.add(0);
-        }
-
-        try {
-            FileInputStream fileIn = this.openFileInput("data.txt");
-            if(fileIn !=null) {
-                ObjectInputStream objectIn = new ObjectInputStream(fileIn);
-                data = (ArrayList<Integer>) objectIn.readObject();
-                objectIn.close();
-                fileIn.close();
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         ViewPager2 viewPager = findViewById(R.id.viewPager);
-
-        getWindow().setBackgroundDrawableResource(R.drawable.background);
-        getWindow().setDimAmount(0.8f);
 
         MyPagerAdapter pagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), getLifecycle());
         viewPager.setAdapter(pagerAdapter);
@@ -85,31 +54,22 @@ public class MainActivity extends AppCompatActivity {
                 (tab, position) -> {
                     switch (position) {
                         case 0:
-                            tab.setText("任务");
+                            tab.setText("图书");
                             break;
                         case 1:
-                            tab.setText("奖励");
+                            tab.setText("新闻");
                             break;
                         case 2:
-                            tab.setText("统计");
+                            tab.setText("地图");
                             break;
                         case 3:
-                            tab.setText("我的");
+                            tab.setText("时钟");
+                            break;
+                        case 4:
+                            tab.setText("游戏");
                             break;
                     }
                 }
         ).attach();
-    }
-    public void onStop(){
-        super.onStop();
-        try {
-            FileOutputStream fileOut = this.openFileOutput("data.txt", Context.MODE_PRIVATE);
-            ObjectOutputStream objectOut = new ObjectOutputStream(fileOut);
-            objectOut.writeObject(data);
-            objectOut.close();
-            fileOut.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }
